@@ -26,6 +26,9 @@ jobs:
           test "$GITHUB_REF" = "refs/heads/main"
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           test -n "${{ github.event.before }}"
+      - name: Compile packages without executing tests
+        shell: bash
+        run: go test -run '^$' ./...
       - name: Re-run authoritative post-main proof
         shell: bash
         run: |
