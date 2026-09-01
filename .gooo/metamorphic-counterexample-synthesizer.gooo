@@ -1,0 +1,27 @@
+gooo metamorphic_counterexample_synthesizer v1
+
+authority metacode
+authority_boundary repository_writes=0 commit_authority=0 push_authority=0 merge_authority=0 release_authority=0 local_test_executions=0 caller_owned_output_only=true
+denominator id=metamorphic-counterexample-synthesizer-v1 scenarios=8 unit=metamorphic_relation
+decision statuses=CLOSED,UNKNOWN,REFUTED
+precedence REFUTED>UNKNOWN>CLOSED
+unknown_fields stage,step,reason,unknown_class,next_operation,blocked_by
+toolchain go=1.27 digest=sha256:go1.27
+runner_policy evaluator_generator_runtime_only=true
+
+activity ordinal=1 id=DeclareMetamorphicRelation input=source output=relation_contract edge=source_to_relation_contract
+activity ordinal=2 id=BoundCandidateDomain input=relation_contract output=bounded_domain edge=relation_contract_to_bounded_domain
+activity ordinal=3 id=GenerateCandidate input=bounded_domain output=candidate_source_ir edge=bounded_domain_to_candidate
+activity ordinal=4 id=ExecuteSemanticOracle input=candidate_source_ir output=oracle_trace edge=candidate_to_oracle_trace
+activity ordinal=5 id=PreserveCounterexample input=oracle_trace output=counterexample_receipt edge=oracle_trace_to_counterexample
+activity ordinal=6 id=CloseBoundedClaim input=counterexample_receipt output=bounded_claim edge=counterexample_to_bounded_claim
+activity ordinal=7 id=EmitSynthesisReceipt input=bounded_claim output=synthesis_receipt edge=bounded_claim_to_receipt
+
+relation ordinal=1 id=alpha-renaming kind=alpha_renaming candidates=rename_x_y|rename_x_z bound=2 oracle=alpha_semantic expected=CLOSED fixture=fixtures/scenarios.json relation_contract_digest=sha256:b3c1e355c0f72c5e9451ddce5ebc76b5eea8f7923ab430494aeaba54228120a0
+relation ordinal=2 id=commutative-normalization kind=commutative_normalization candidates=swap_add_ab|swap_add_ac bound=2 oracle=commutative_semantic expected=CLOSED fixture=fixtures/scenarios.json relation_contract_digest=sha256:b3c1e355c0f72c5e9451ddce5ebc76b5eea8f7923ab430494aeaba54228120a0
+relation ordinal=3 id=byte-identical-replay kind=byte_identical_replay candidates=replay_identity bound=1 oracle=byte_identity expected=CLOSED fixture=fixtures/scenarios.json relation_contract_digest=sha256:b3c1e355c0f72c5e9451ddce5ebc76b5eea8f7923ab430494aeaba54228120a0
+relation ordinal=4 id=arithmetic-rewrite kind=arithmetic_rewrite candidates=rewrite_sub_to_add bound=1 oracle=arithmetic_semantic expected=REFUTED fixture=fixtures/scenarios.json relation_contract_digest=sha256:b3c1e355c0f72c5e9451ddce5ebc76b5eea8f7923ab430494aeaba54228120a0
+relation ordinal=5 id=effect-reordering kind=effect_reordering candidates=reorder_effects bound=1 oracle=effect_trace expected=REFUTED fixture=fixtures/scenarios.json relation_contract_digest=sha256:b3c1e355c0f72c5e9451ddce5ebc76b5eea8f7923ab430494aeaba54228120a0
+relation ordinal=6 id=bound-exhausted kind=bound_exhausted candidates=rename_a_b|rename_a_c|rename_a_d|rename_a_e bound=2 oracle=alpha_semantic expected=UNKNOWN fixture=fixtures/scenarios.json relation_contract_digest=sha256:b3c1e355c0f72c5e9451ddce5ebc76b5eea8f7923ab430494aeaba54228120a0
+relation ordinal=7 id=missing-semantic-oracle kind=missing_semantic_oracle candidates=identity bound=1 oracle=missing expected=UNKNOWN fixture=fixtures/scenarios.json relation_contract_digest=sha256:b3c1e355c0f72c5e9451ddce5ebc76b5eea8f7923ab430494aeaba54228120a0
+relation ordinal=8 id=stale-relation-contract kind=stale_relation_contract candidates=identity bound=1 oracle=byte_identity expected=UNKNOWN fixture=fixtures/scenarios.json relation_contract_digest=sha256:STALE_RELATION_CONTRACT

@@ -1,0 +1,14 @@
+{
+  "schema": "gooo/metamorphic-counterexample-synthesizer/fixtures/v1",
+  "version": "v1",
+  "scenarios": [
+    {"id":"alpha-renaming","base_source":"let x = 1 in x + 1","baseline_ir":"let $v1 = 1 in $v1 + 1","baseline_trace":["result=2"]},
+    {"id":"commutative-normalization","base_source":"add(b,a)","baseline_ir":"add(a,b)","baseline_trace":["result=commutative"]},
+    {"id":"byte-identical-replay","base_source":"emit(identical-bytes)","baseline_ir":"emit(identical-bytes)","baseline_trace":["bytes=identical"]},
+    {"id":"arithmetic-rewrite","base_source":"sub(4,3)","baseline_ir":"sub(4,3)","baseline_trace":["result=1"]},
+    {"id":"effect-reordering","base_source":"effect(A);effect(B)","baseline_ir":"effect(A);effect(B)","baseline_trace":["effect=A","effect=B"]},
+    {"id":"bound-exhausted","base_source":"let a = 1 in a + 1","baseline_ir":"let $v1 = 1 in $v1 + 1","baseline_trace":["result=2"]},
+    {"id":"missing-semantic-oracle","base_source":"emit(oracle-required)","baseline_ir":"emit(oracle-required)","baseline_trace":["source=emit(oracle-required)"]},
+    {"id":"stale-relation-contract","base_source":"emit(stale-contract)","baseline_ir":"emit(stale-contract)","baseline_trace":["source=emit(stale-contract)"]}
+  ]
+}

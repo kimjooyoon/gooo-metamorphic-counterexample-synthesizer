@@ -1,0 +1,56 @@
+name: post-main metamorphic proof
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  post-main:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.27.0'
+          check-latest: true
+          cache: true
+      - name: Verify merged main coordinate
+        run: |
+          set -Eeuo pipefail
+          test "$GITHUB_REF" = "refs/heads/main"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test -n "${{ github.event.before }}"
+      - name: Re-run authoritative post-main proof
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          go vet ./...
+          go test -count=1 ./...
+          runner="$RUNNER_TEMP/gooo-synth"
+          go build -trimpath -o "$runner" ./cmd/gooo-metamorphic-counterexample-synthesizer
+          "$runner" conformance \
+            --source .gooo/metamorphic-counterexample-synthesizer.gooo \
+            --contract contracts/metamorphic-counterexample-synthesizer-v1.json \
+            --fixtures fixtures/scenarios.json \
+            --repo-root "$GITHUB_WORKSPACE" \
+            --output "$RUNNER_TEMP/conformance.json"
+          export RUNNER_DIGEST="sha256:$(sha256sum "$runner" | awk '{print $1}')"
+          export SUBJECT_SHA="$GITHUB_SHA"
+          export TOOLCHAIN_VERSION="$(go env GOVERSION)"
+          mkdir -p "$RUNNER_TEMP/synthesis-output"
+          bash scripts/run-synthesis.sh "$GITHUB_WORKSPACE" "$runner" "$RUNNER_TEMP/synthesis-output"
+          jq -e '.decision == "REFUTED" and .counts.scenarios == 8 and .counts.closed == 3 and .counts.unknown == 3 and .counts.refuted == 2 and .improvement.status == "UNKNOWN"' "$RUNNER_TEMP/synthesis-output/synthesis-manifest.json" >/dev/null
+          test "$(git status --porcelain)" = ""
+      - uses: actions/upload-artifact@v4
+        with:
+          name: post-main-metamorphic-proof-${{ github.sha }}
+          if-no-files-found: error
+          path: |
+            ${{ runner.temp }}/conformance.json
+            ${{ runner.temp }}/synthesis-output/*
