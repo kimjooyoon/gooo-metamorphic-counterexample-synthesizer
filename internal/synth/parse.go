@@ -50,6 +50,8 @@ func parseMeta(input string) (MetaContract, error) {
 				meta.Authority = tokens[1]
 				continue
 			}
+			fallthrough
+		case "authority_boundary":
 			values, err := keyValues(tokens[1:])
 			if err != nil {
 				return MetaContract{}, lineError(lineNumber, err)
