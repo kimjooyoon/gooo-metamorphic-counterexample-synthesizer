@@ -1,0 +1,29 @@
+{
+  "schema": "gooo/metamorphic-counterexample-synthesizer/contract/v1",
+  "id": "metamorphic-counterexample-synthesizer-v1",
+  "version": "v1",
+  "scenario_count": 8,
+  "fixed": true,
+  "statuses": ["CLOSED", "UNKNOWN", "REFUTED"],
+  "precedence": ["REFUTED", "UNKNOWN", "CLOSED"],
+  "unit": "metamorphic_relation",
+  "activities": [
+    {"ordinal":1,"id":"DeclareMetamorphicRelation","input":"source","output":"relation_contract","edge":"source_to_relation_contract"},
+    {"ordinal":2,"id":"BoundCandidateDomain","input":"relation_contract","output":"bounded_domain","edge":"relation_contract_to_bounded_domain"},
+    {"ordinal":3,"id":"GenerateCandidate","input":"bounded_domain","output":"candidate_source_ir","edge":"bounded_domain_to_candidate"},
+    {"ordinal":4,"id":"ExecuteSemanticOracle","input":"candidate_source_ir","output":"oracle_trace","edge":"candidate_to_oracle_trace"},
+    {"ordinal":5,"id":"PreserveCounterexample","input":"oracle_trace","output":"counterexample_receipt","edge":"oracle_trace_to_counterexample"},
+    {"ordinal":6,"id":"CloseBoundedClaim","input":"counterexample_receipt","output":"bounded_claim","edge":"counterexample_to_bounded_claim"},
+    {"ordinal":7,"id":"EmitSynthesisReceipt","input":"bounded_claim","output":"synthesis_receipt","edge":"bounded_claim_to_receipt"}
+  ],
+  "scenarios": [
+    {"ordinal":1,"id":"alpha-renaming","kind":"alpha_renaming","candidate_count":2,"bound":2,"expected":"CLOSED"},
+    {"ordinal":2,"id":"commutative-normalization","kind":"commutative_normalization","candidate_count":2,"bound":2,"expected":"CLOSED"},
+    {"ordinal":3,"id":"byte-identical-replay","kind":"byte_identical_replay","candidate_count":1,"bound":1,"expected":"CLOSED"},
+    {"ordinal":4,"id":"arithmetic-rewrite","kind":"arithmetic_rewrite","candidate_count":1,"bound":1,"expected":"REFUTED"},
+    {"ordinal":5,"id":"effect-reordering","kind":"effect_reordering","candidate_count":1,"bound":1,"expected":"REFUTED"},
+    {"ordinal":6,"id":"bound-exhausted","kind":"bound_exhausted","candidate_count":4,"bound":2,"expected":"UNKNOWN"},
+    {"ordinal":7,"id":"missing-semantic-oracle","kind":"missing_semantic_oracle","candidate_count":1,"bound":1,"expected":"UNKNOWN"},
+    {"ordinal":8,"id":"stale-relation-contract","kind":"stale_relation_contract","candidate_count":1,"bound":1,"expected":"UNKNOWN"}
+  ]
+}
